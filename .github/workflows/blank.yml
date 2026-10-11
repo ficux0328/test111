@@ -17,8 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download firmware from archive.org
-        run: curl -L --fail --retry 3 -o ColorOS_16_RMX3031.zip \
-          "https://archive.org/download/rmx3031-coloros-16/ColorOS_16_RMX3031.zip"
+        run: curl -L --fail --retry 3 -o ColorOS_16_RMX3031.zip https://archive.org/download/rmx3031-coloros-16/ColorOS_16_RMX3031.zip
 
       - name: Show file info
         run: |

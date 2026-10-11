@@ -16,18 +16,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download firmware from archive.org
-        run: curl -L --fail --retry 3 -o ColorOS_16_RMX3031.zip https://archive.org/download/rmx3031-coloros-16/ColorOS_16_RMX3031.zip
-
-      - name: Show file info
+      - name: Download firmware (resume + retry)
         run: |
+          URL="https://archive.org/download/rmx3031-coloros-16/ColorOS_16_RMX3031.zip"
+          for i in 1 2 3 4 5 6 7 8; do
+            echo "== attempt $i =="
+            curl -L --fail -C - -o ColorOS_16_RMX3031.zip "$URL" && break
+            sleep 10
+          done
           ls -lh ColorOS_16_RMX3031.zip
-          sha256sum ColorOS_16_RMX3031.zip
 
-      - name: Create GitHub Release and upload
+      - name: Split into parts (each under 2GB)
+        run: |
+          mkdir -p parts
+          split -b 1500m -d --additional-suffix=.part ColorOS_16_RMX3031.zip parts/ColorOS_16_RMX3031_
+          ls -lh parts/
+
+      - name: Create GitHub Release and upload parts
         uses: softprops/action-gh-release@v2
         with:
           tag_name: rmx3031-coloros16
           name: ColorOS_16_RMX3031.zip
-          files: ColorOS_16_RMX3031.zip
+          files: parts/*
           token: ${{ secrets.GITHUB_TOKEN }}

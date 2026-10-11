@@ -1,0 +1,34 @@
+name: Download RMX3031 Firmware
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download firmware from archive.org
+        run: curl -L --fail --retry 3 -o ColorOS_16_RMX3031.zip \
+          "https://archive.org/download/rmx3031-coloros-16/ColorOS_16_RMX3031.zip"
+
+      - name: Show file info
+        run: |
+          ls -lh ColorOS_16_RMX3031.zip
+          sha256sum ColorOS_16_RMX3031.zip
+
+      - name: Create GitHub Release and upload
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: rmx3031-coloros16
+          name: ColorOS_16_RMX3031.zip
+          files: ColorOS_16_RMX3031.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
